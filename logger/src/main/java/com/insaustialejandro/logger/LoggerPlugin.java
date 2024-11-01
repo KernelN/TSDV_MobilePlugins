@@ -30,13 +30,18 @@ public class LoggerPlugin {
         currentLogs += "\n" + msg;
         Log.i(LOGTAG, msg);
     }
-    public String GetLogs() { return currentLogs; }
+    public String GetLogs()
+    {
+        Log.i(LOGTAG, "Logs: " + currentLogs);
+        return currentLogs;
+    }
     public void SaveLogs()
     {
         try {
             FileWriter writer = new FileWriter(filePath);
             writer.write(currentLogs);
             writer.close();
+            Log.i(LOGTAG, "Logs saved to file");
         } catch (IOException e) {
             currentLogs += "\n ERROR SAVING FILE";
             throw new RuntimeException(e);
@@ -46,14 +51,16 @@ public class LoggerPlugin {
     {
         try {
             FileWriter writer = new FileWriter(filePath);
-            writer.write("");
+            writer.write(" ");
             writer.close();
+            Log.i(LOGTAG, "Logs file cleared");
             try{
                 FileReader reader = new FileReader(filePath);
-                char[] logs = new char[1000];
+                char[] logs = new char[100];
                 reader.read(logs);
+                Log.i(LOGTAG, "Clean logs file content: " + logs);
                 reader.close();
-                currentLogs = new String(logs);
+                currentLogs = "";
             } catch (IOException e) {
                 currentLogs += "\n ERROR READING FILE";
                 throw new RuntimeException(e);
