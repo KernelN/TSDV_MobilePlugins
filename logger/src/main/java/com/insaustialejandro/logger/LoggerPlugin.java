@@ -32,7 +32,7 @@ public class LoggerPlugin {
         Log.i(LOGTAG, "Setting logger");
 
         mainActivity = activity;
-        currentLogs = "Plugin start";
+        currentLogs = "Plugin Started";
         filePath = mainActivity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) + "/logs.txt";
 
         dialogBuilder = new AlertDialog.Builder(mainActivity);
@@ -55,38 +55,43 @@ public class LoggerPlugin {
 
     public void SendLog(String msg)
     {
-        currentLogs += "\n" + msg;
         Log.i(LOGTAG, msg);
+        msg = "\n" + msg;
+        currentLogs += msg;
+        SaveLogs(msg);
     }
-    public String GetLogs()
-    {
-        Log.i(LOGTAG, "Logs: " + currentLogs);
-        return currentLogs;
-    }
-    public void SaveLogs()
+    void SaveLogs(String msg)
     {
         try {
-            FileWriter writer = new FileWriter(filePath);
-            writer.write(currentLogs);
+            FileWriter writer = new FileWriter(filePath, true);
+            writer.write(msg);
             writer.close();
             Log.i(LOGTAG, "Logs saved to file");
         } catch (IOException e) {
-            currentLogs += "\n ERROR SAVING FILE";
-            throw new RuntimeException(e);
+            Log.e(LOGTAG, "Logs file save FAILED: " + e.getMessage());
+            currentLogs += "\n ERROR SAVING FILE: " + e.getMessage();
         }
+    }
+    public String GetLogs()
+    {
+        return currentLogs;
     }
     public void ReadLogs()
     {
         try{
             FileReader reader = new FileReader(filePath);
-            char[] logs = new char[10000];
-            reader.read(logs);
-            currentLogs = Arrays.toString(logs);
-            Log.i(LOGTAG, "Clean logs file content: " + logs);
+            currentLogs = "";
+            boolean hasTextLeft = true;
+            while(hasTextLeft)
+            {
+                int c = reader.read();
+                if(c < 0) hasTextLeft = false;
+                else currentLogs += (char)c;
+            }
             reader.close();
         } catch (IOException e) {
-            currentLogs += "\n ERROR READING FILE";
-            throw new RuntimeException(e);
+            Log.e(LOGTAG, "Logs file read FAILED: " + e.getMessage());
+            currentLogs += "\n ERROR READING FILE: " + e.getMessage();
         }
     }
     public void ClearLogs()
